@@ -1,7 +1,14 @@
 #include <iostream>
 #include <string>
+#include <limits>
 
 using namespace std;
+
+void wait() {
+    printf("Press Enter to proceed...\n");
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.clear();
+}
 
 void displayWelcomeMessage() {
     system("clear");
@@ -10,8 +17,7 @@ void displayWelcomeMessage() {
     printf("This program receives a steam of characters\n");
     printf("and returns a string with modification specified\n");
     printf("by the user.\n\n");
-    printf("Press Enter to proceed...\n");
-    cin.ignore();
+    wait();
 }
 
 void displayMenuOptions() {
@@ -22,25 +28,22 @@ void displayMenuOptions() {
     printf("----------------------\n");
 }
 
-bool promptStringInput(string str) {
+void requestStringInput(string& str) {
     system("clear");
     printf("Enter text and press Enter\n");
     printf("----------------------\n");
-    try {
-        getline(cin, str);
-    } catch(exception& e) {
-        cout << "Invalid string : " << e.what() << endl;
-    }
+    getline(cin, str);
 }
 
-void reverseString(string str) {
-
+void reverseString(string& str) {
+    for(int i = 0; i <= str.length()/2; i++)
+        swap(str[i], str[str.length()-i-1]);
 }
-
 
 int main() {
-    const int MENU_RANGE = 1;
     const int EXIT_CODE = 0;
+    const int MENU_RANGE = 1;
+    
     int menuOption;
     string usrStr;
 
@@ -48,20 +51,27 @@ int main() {
     
     while(menuOption != EXIT_CODE) {
         displayMenuOptions();
-        cin >> menuOption;
-        cin.ignore();
+                       
+        while(!(cin >> menuOption) || (menuOption < 0 || menuOption > MENU_RANGE)) {
+            printf("Invalid menu option\n");
+            wait();
+            displayMenuOptions();
+        }
 
         if(menuOption == EXIT_CODE) break;
-        if(menuOption < 0 || menuOption > MENU_RANGE) {
-            printf("Invalid menu option. Press Enter to continue\n");
-            cin.ignore();
-        } else {
-            promptStringInput(usrStr);
-            switch(menuOption) {
-                case 1: reverseString(usrStr);
-            }           
-        }       
- 
+        
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        requestStringInput(usrStr);
+        
+        switch(menuOption) {
+            case 1:
+                reverseString(usrStr); 
+                break;
+        }
+        
+        cout << usrStr << endl;
+        wait();           
+       
     }
     return 0;
 }
